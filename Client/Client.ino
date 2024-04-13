@@ -11,28 +11,17 @@
 #include <esp_now.h>
 #include <WiFi.h>
  
-// Variables for test data
-int int_value;
-float float_value;
-bool bool_value = true;
- 
+#include "DataStructure.h"
+
 // MAC Address of responder - edit as required
 uint8_t broadcastAddress[] = {0xFC, 0xB4, 0x67, 0xF5, 0x68, 0x20};
  
-// Define a data structure
-typedef struct struct_message {
-  char a[32];
-  int b;
-  float c;
-  bool d;
-} struct_message;
- 
-// Create a structured object
-struct_message myData;
- 
 // Peer info
 esp_now_peer_info_t peerInfo;
- 
+
+// Pins
+constexpr unsigned short AnalogIn = 36;
+
 // Callback function called when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.print("\r\nLast Packet Send Status:\t");
@@ -69,26 +58,16 @@ void setup() {
 }
  
 void loop() {
- 
-  // Create test data
- 
-  // Generate a random integer
-  int_value = random(1,20);
- 
-  // Use integer to make a new float
-  float_value = 1.3 * int_value;
- 
-  // Invert the boolean value
-  bool_value = !bool_value;
-  
-  // Format structured data
-  strcpy(myData.a, "Welcome to the Workshop!");
-  myData.b = int_value;
-  myData.c = float_value;
-  myData.d = bool_value;
-  
+  // Get readings
+  for(unsigned short i = 0; i < (PACKET_SIZE / 3); i++){
+    compression.d[0] = analogRead(AnalogIn);
+    compression.d[1] = analogRead(AnalogIn);
+
+    WriteBuffer(i);
+  }
+
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&packet_buffer, PACKET_SIZE * sizeof(char));
    
   if (result == ESP_OK) {
     Serial.println("Sending confirmed");
@@ -96,5 +75,4 @@ void loop() {
   else {
     Serial.println("Sending error");
   }
-  delay(2000);
 }

@@ -11,32 +11,26 @@
 #include <esp_now.h>
 #include <WiFi.h>
  
-// Define a data structure
-typedef struct struct_message {
-  char a[32];
-  int b;
-  float c;
-  bool d;
-} struct_message;
- 
-// Create a structured object
-struct_message myData;
- 
- 
+#include "DataStructure.h"
+
+unsigned count;
+
 // Callback function executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  memcpy(&myData, incomingData, sizeof(myData));
-  Serial.print("Data received: ");
-  Serial.println(len);
-  Serial.print("Character Value: ");
-  Serial.println(myData.a);
-  Serial.print("Integer Value: ");
-  Serial.println(myData.b);
-  Serial.print("Float Value: ");
-  Serial.println(myData.c);
-  Serial.print("Boolean Value: ");
-  Serial.println(myData.d);
-  Serial.println();
+  memcpy(&packet_buffer, incomingData, PACKET_SIZE * sizeof(char));
+  
+  count++;
+  
+  Serial.print(count);
+  Serial.print("\tData received: ");
+  Serial.print(len);
+
+  ReadBuffer(0);
+
+  Serial.print("\tValue 1: ");
+  Serial.print(compression.d[0]);
+  Serial.print("\tValue 2: ");
+  Serial.println(compression.d[1]);
 }
  
 void setup() {
