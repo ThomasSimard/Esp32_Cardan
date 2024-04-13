@@ -1,5 +1,5 @@
 # Esp32_Cardan
-Code pour les capteurs des cardans.
+Code pour les capteurs des cardans. Pour l'instant avec un ESP32 et sans logger les données ils est possible d'atteindre un peu plus que 7k5SPS.
 
 ### Client
 Le code du client est celui qui vas dans les ESP32 sur les cardans. Il permet de lire l'entré analogue de l'amplificateur.
