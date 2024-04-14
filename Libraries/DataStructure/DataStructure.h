@@ -1,16 +1,26 @@
+constexpr uint8_t client_address[] = {0x84, 0xCC, 0xA8, 0x61, 0x01, 0x4C}; //Client with pot
+constexpr uint8_t server_address[] = {0xFC, 0xB4, 0x67, 0xF5, 0x68, 0x20}; //Server
+constexpr uint8_t broadcaster_address[] = {0x84, 0xCC, 0xA8, 0x60, 0xCC, 0xE4}; //Broadcaster without pot
 
 //166 Read With 249 bytes
 constexpr unsigned short PACKET_SIZE = 249;
 
 struct Data{
-  char flags; //1 bytes
-  char packet_buffer[PACKET_SIZE]; //249 bytes
-} data; //250 bytes out of 250 for message
+  byte flags; //1 bytes
+  byte packet_buffer[PACKET_SIZE]; //249 bytes
+}; //250 bytes out of 250 for message
+
+Data data, broadcast_data;
 
 union {
   byte b[4];
   short d[2];
 } compression;
+
+enum Status {
+  Default,
+  Broadcasted,
+};
 
 //Take value from 0 to 4096
 //Compress 2, 12 bits input to  3, 8 bits output 

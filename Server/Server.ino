@@ -10,8 +10,8 @@
 // Include Libraries
 #include <esp_now.h>
 #include <WiFi.h>
- 
-#include "DataStructure.h"
+
+#include <DataStructure.h> //Put the Local Libraries DataStructure folder into your arduinos library folder
 
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
@@ -36,7 +36,7 @@ public:
 };
 
 Capteur ESPs[] = { 
-  Capteur(mac_01)
+  Capteur(broadcaster_address)
 };
 
 // Callback function executed when data is received
@@ -70,8 +70,7 @@ void setup() {
  
   // Initilize ESP-NOW
   if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
-    return;
+    ESP.restart();
   }
   
   // Register callback function

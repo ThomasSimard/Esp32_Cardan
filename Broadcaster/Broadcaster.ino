@@ -11,8 +11,8 @@
 #include <esp_now.h>
 #include <WiFi.h>
  
-#include <DataStructure.h>
- 
+#include <DataStructure.h> //Put the Local Libraries DataStructure folder into your arduinos library folder
+
 // Peer info
 esp_now_peer_info_t peerInfo;
 
@@ -20,9 +20,25 @@ esp_now_peer_info_t peerInfo;
 constexpr unsigned short AnalogIn = 36;
 
 // Callback function called when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {}
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
+
+// Callback function executed when data is received
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  memcpy(&broadcast_data, incomingData, sizeof(Data));
+
+  broadcast_data.flags = Status::Broadcasted;
+
+  esp_err_t result = esp_now_send(server_address, (uint8_t *)&broadcast_data, sizeof(Data));
+}
  
 void setup() {
+  
+  // Set up Serial Monitor
+  Serial.begin(115200);
+ 
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
  
@@ -31,16 +47,18 @@ void setup() {
     ESP.restart();
   }
  
-  // Register the send callback
+  // Register callback function
   esp_now_register_send_cb(OnDataSent);
-  
+  esp_now_register_recv_cb(OnDataRecv);
+
   // Register peer
-  memcpy(peerInfo.peer_addr, broadcaster_address, 6);
+  memcpy(peerInfo.peer_addr, server_address, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
   
   // Add peer        
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
     return;
   }
 }
@@ -54,15 +72,15 @@ void loop() {
     WriteBuffer(i);
   }
 
-  // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcaster_address, (uint8_t *)&data, sizeof(Data));
+  data.flags = Status::Default;
 
-/*   
+  // Send message via ESP-NOW
+  esp_err_t result = esp_now_send(server_address, (uint8_t *)&data, sizeof(Data));
+   
   if (result == ESP_OK) {
     Serial.println("Sending confirmed");
   }
   else {
     Serial.println("Sending error");
   }
-*/
 }
