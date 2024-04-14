@@ -67,7 +67,7 @@ void loop() {
   }
 
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&packet_buffer, PACKET_SIZE * sizeof(char));
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&data, sizeof(Data));
    
   if (result == ESP_OK) {
     Serial.println("Sending confirmed");

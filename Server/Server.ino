@@ -13,9 +13,7 @@
  
 #include "DataStructure.h"
 
-constexpr uint8_t esp_mac1[] = {0x84, 0xCC, 0xA8, 0x61, 0x01, 0x4C};
-
-unsigned count1, count2;
+#define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
 bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
   return (mac0[0] == mac1[0] &&
@@ -26,32 +24,41 @@ bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
         mac0[5] == mac1[5]);
 }
 
+class Capteur {
+private:
+  uint8_t mac[6];
+public:
+  Capteur(const uint8_t * p_mac){
+    memcpy(&mac, p_mac, 6 * sizeof(uint8_t));
+  }
+
+  bool CheckMac(const uint8_t * p_mac) const { return CompareMacAddress(p_mac, mac); };
+};
+
+Capteur ESPs[] = { 
+  Capteur(mac_01)
+};
+
 // Callback function executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  memcpy(&packet_buffer, incomingData, PACKET_SIZE * sizeof(char)); //Maybe we can take the incoming data directly OPTIMISATION!
-  
-  Serial.print("\t");
+  memcpy(&data, incomingData, sizeof(Data));
 
-  if(CompareMacAddress(mac, esp_mac1)){
-    count1++;
-    Serial.print(count1);
-    Serial.print("\t1");
+  for(const auto& ESP : ESPs){
+    if(ESP.CheckMac(mac)){
+      Serial.print(data.flags);
+      Serial.print("\t");
+      Serial.print(millis());
+      Serial.print("\t");
+
+      ReadBuffer(0);
+
+      Serial.print("Value 1: ");
+      Serial.print(compression.d[0]);
+      Serial.print("\tValue 2: ");
+      Serial.println(compression.d[1]);
+      break;
+    }
   }
-  else{
-    Serial.print(count2);
-    Serial.print("\t2");
-    count2++;
-  }
-  
-  Serial.print("\tData received: ");
-  Serial.print(len);
-
-  ReadBuffer(0);
-
-  Serial.print("\tValue 1: ");
-  Serial.print(compression.d[0]);
-  Serial.print("\tValue 2: ");
-  Serial.println(compression.d[1]);
 }
  
 void setup() {
