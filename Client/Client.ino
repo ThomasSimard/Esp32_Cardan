@@ -23,6 +23,9 @@ constexpr unsigned short AnalogIn = 36;
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {}
  
 void setup() {
+  // Save power
+  setCpuFrequencyMhz(80);
+
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
  
@@ -52,6 +55,7 @@ void loop() {
     compression.d[1] = analogRead(AnalogIn);
 
     WriteBuffer(i);
+    delayMicroseconds(250); // Save power
   }
 
   // Send message via ESP-NOW

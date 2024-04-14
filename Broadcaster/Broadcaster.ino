@@ -20,10 +20,7 @@ esp_now_peer_info_t peerInfo;
 constexpr unsigned short AnalogIn = 36;
 
 // Callback function called when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {}
 
 // Callback function executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
@@ -35,10 +32,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 }
  
 void setup() {
-  
-  // Set up Serial Monitor
-  Serial.begin(115200);
- 
+  // Save power
+  setCpuFrequencyMhz(80);
+
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
  
@@ -58,7 +54,6 @@ void setup() {
   
   // Add peer        
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
     return;
   }
 }
@@ -70,6 +65,7 @@ void loop() {
     compression.d[1] = analogRead(AnalogIn);
 
     WriteBuffer(i);
+    delayMicroseconds(250); // Save power
   }
 
   data.flags = Status::Default;
@@ -77,10 +73,10 @@ void loop() {
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(server_address, (uint8_t *)&data, sizeof(Data));
    
-  if (result == ESP_OK) {
+  /*if (result == ESP_OK) {
     Serial.println("Sending confirmed");
   }
   else {
     Serial.println("Sending error");
-  }
+  }*/
 }
