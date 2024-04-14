@@ -1,4 +1,4 @@
-# Esp32_Cardan
+# Esp32 Cardan
 Code pour les capteurs des cardans.
 
 ![SystemDiagram](SystemDiagram.drawio.png)
