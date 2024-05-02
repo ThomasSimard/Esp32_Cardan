@@ -28,6 +28,9 @@ constexpr unsigned GPSr = 7;  //Change pinout accordint to ESP
 constexpr unsigned GPSg = 4;
 constexpr unsigned GPSb = 6;
 
+/*initialisation carte SD*/
+constexpr unsigned SD_ChipSelect = 10; 
+
 constexpr unsigned Toggle = 5;
 
 
@@ -59,9 +62,9 @@ class RGB_LED{
 
 
 /*Define LEDs*/
-comLED = RGB_LED(COMMr, COMMg, COMMb);
-sdLED = RGB_LED(SDr, SDg, SDb);
-GPSLED = RGB_LED(GPSr, GPSg, GPSb);
+RGB_LED comLED(COMMr, COMMg, COMMb);
+RGB_LED sdLED(SDr, SDg, SDb);
+RGB_LED GPSLED(GPSr, GPSg, GPSb);
 
 class Capteur {
 private:
@@ -124,12 +127,13 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
             digitalWrite(RedLed1, HIGH);
           }
       }
-          MyFile.println(compression.d[0])
-          MyFile.println(compression.d[1])
+          MyFile.println(compression.d[0]);
+          MyFile.println(compression.d[1]);
 
           }else{
             myFile.close();
             isOpen = false;
+            sdLED.selectColour(1,255,1);
           }
 
           delay(20);
@@ -143,16 +147,24 @@ void setup() {
   Serial.begin(115200);
 
   //carte SD
-  pinMode(RedLed1, OUTPUT);
-  pinMode(RedLed2, OUTPUT);
+  pinMode(COMMr, OUTPUT);
+  pinMode(COMMg, OUTPUT);
+  pinMode(COMMb, OUTPUT);
 
-  pinMode(YellowLed, OUTPUT);
+  pinMode(SDr, OUTPUT);
+  pinMode(SDg, OUTPUT);
+  pinMode(SDb, OUTPUT);
+
+  pinMode(GPSr, OUTPUT);
+  pinMode(GPSg, OUTPUT);
+  pinMode(GPSb, OUTPUT);
+
   pinMode(Toggle, INPUT);
 
   /* SD */
   while (!SD.begin(SD_ChipSelect)) {
     D_println("Card failed, or not present");
-    digitalWrite(RedLed1, HIGH);
+    sdLED.selectColour(255,1,1);
     delay(100);
   }
   D_println("Card initialized.");
