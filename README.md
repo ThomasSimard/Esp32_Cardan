@@ -13,6 +13,7 @@ Chaque ESP32 a une adresse MAC unique, pour la déterminer il suffit d'upload le
 
 1. D4:8A:FC:CE:D4:C4
 2. FC:B4:67:F5:EC:28
+3. E8:6B:EA:CF:0A:00
 ### LED
 On définit 3 LED de couleur variables (RGB) qui ont pour fonction de nous indiquer différents états du système. <br/>
 <br/>
