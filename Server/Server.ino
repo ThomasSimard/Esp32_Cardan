@@ -1,38 +1,17 @@
-/*
-  ESP-NOW Demo - Receive
-  esp-now-demo-rcv.ino
-  Reads data from Initiator
-  
-  DroneBot Workshop 2022
-  https://dronebotworkshop.com
-*/
- 
 // Include Libraries
+#include <SPI.h>
+#include <SD.h>
+
 #include <esp_now.h>
 #include <WiFi.h>
 
 #include <DataStructure.h> //Put the Local Libraries DataStructure folder into your arduinos library folder
+#include "RGB_LED.h"
 
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
-/*Pinout for status leds*/
-constexpr unsigned COMMr = 7;  //Change pinout accordint to ESP
-constexpr unsigned COMMg = 4;
-constexpr unsigned COMMb = 6;
-
-constexpr unsigned SDr = 7;  //Change pinout accordint to ESP
-constexpr unsigned SDg = 4;
-constexpr unsigned SDb = 6;
-
-constexpr unsigned GPSr = 7;  //Change pinout accordint to ESP
-constexpr unsigned GPSg = 4;
-constexpr unsigned GPSb = 6;
-
 /*initialisation carte SD*/
 constexpr unsigned SD_ChipSelect = 10; 
-
-constexpr unsigned Toggle = 5;
-
 
 bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
   return (mac0[0] == mac1[0] &&
@@ -43,28 +22,11 @@ bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
         mac0[5] == mac1[5]);
 }
 
-class RGB_LED{
-  public:
-  RGB_LED(int redPin, int greenPin, int bluePin) : redPin(redPin) , greenPin(greenPin), bluePin(bluePin){
-  }
-
-  void selectColour(int redValue, int greenValue, int blueValue){
-    analogWrite(redPin, redValue);
-    analogWrite(greenPin, greenValue);
-    analogWrite(bluePin, blueValue);
-  }
-
-  private:
-  int redPin;
-  int greenPin;
-  int bluePin;
-}
-
 
 /*Define LEDs*/
-RGB_LED comLED(COMMr, COMMg, COMMb);
-RGB_LED sdLED(SDr, SDg, SDb);
-RGB_LED GPSLED(GPSr, GPSg, GPSb);
+RGB_LED comLED(1, 0, 2);
+RGB_LED sdLED(3, 4, 5);
+RGB_LED gpsLED(6, 7, 8);
 
 class Capteur {
 private:
@@ -99,8 +61,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
       Serial.print("\tValue 2: ");
       Serial.println(compression.d[1]);
 
-      bool isRecording = digitalRead(Toggle);
+      //bool isRecording = digitalRead(Toggle);
 
+      /*
       sdLED.selectColour(255, 255, 1)  //jaune, enregistrement en cours
 
       if(isRecording){
@@ -138,7 +101,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
           delay(20);
               break;
-            }
+            }*/
+    }
   }
 }
  
@@ -146,28 +110,13 @@ void setup() {
   // Set up Serial Monitor
   Serial.begin(115200);
 
-  //carte SD
-  pinMode(COMMr, OUTPUT);
-  pinMode(COMMg, OUTPUT);
-  pinMode(COMMb, OUTPUT);
-
-  pinMode(SDr, OUTPUT);
-  pinMode(SDg, OUTPUT);
-  pinMode(SDb, OUTPUT);
-
-  pinMode(GPSr, OUTPUT);
-  pinMode(GPSg, OUTPUT);
-  pinMode(GPSb, OUTPUT);
-
-  pinMode(Toggle, INPUT);
+  comLED.selectColor(255, 0, 0);
 
   /* SD */
   while (!SD.begin(SD_ChipSelect)) {
-    D_println("Card failed, or not present");
-    sdLED.selectColour(255,1,1);
+    sdLED.selectColor(255,1,1);
     delay(100);
   }
-  D_println("Card initialized.");
   
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -180,7 +129,7 @@ void setup() {
   // Register callback function
   esp_now_register_recv_cb(OnDataRecv);
 }
- 
+
 void loop() {
  
 }
