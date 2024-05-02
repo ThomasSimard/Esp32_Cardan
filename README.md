@@ -11,11 +11,20 @@ Le code du broadcaster est celui qui vas dans les ESP32 sur les cardans arrière
 ### Setup
 Chaque ESP32 a une adresse MAC unique, pour la déterminer il suffit d'upload le code de setup. Ceci est important pour savoir lequel des ESP32 est le server et où se situe les ESP32 sur le baja (arrière, devant, droite, gauche).
 ### LED
-On définit 3 LED de couleur variables (RGB) qui ont pour fonction de nous indiquer différents états du système.
-sdLED: indique l'état du lecteur de carte SD
---> vert: Lecture terminée, aucun problème rencontré
---> jaune: Enregistrement en cours
---> rouge: Problème rencontré, enregistrement interrompu ou non commencé
+On définit 3 LED de couleur variables (RGB) qui ont pour fonction de nous indiquer différents états du système. <br/>
+<br/>
+sdLED: indique l'état du lecteur de carte SD <br/>
+--> vert: Lecture terminée, aucun problème rencontré <br/>
+--> jaune: Enregistrement en cours <br/>
+--> rouge: Problème rencontré, enregistrement interrompu ou non commencé <br/>
+<br/>
+commLED: indique l'état de la communication entres les cardans <br/>
+-->vert: tout fonctionne <br/>
+-->jaune: fonctionnement partiel des communications <br/>
+-->rouge: communication complètement planté <br/>
+<br/>
+GPSLED: indique l'état du GPS <br/>
+
 ### Libraries
 Changer les adresses MAC suivante:
 ```
@@ -28,11 +37,11 @@ constexpr uint8_t broadcaster_address[] = {0x84, 0xCC, 0xA8, 0x60, 0xCC, 0xE4};
 Ensuite pour pouvoir compiler le code du Broadcaster, Client et Server, il faut copier coller la librarie dans le folder des libraries Arduino.
 
 ## Futur
-Mettre un syteme d'erreur mieux.<br/>
-Enlever les serials prints.<br/>
-Logger sur la carte SD avec le server.<br/>
-Tester avec 4 ESP32.<br/>
-Tester si les ESP32 en avant peuvent bien transmettre les donnes.<br/>
+- [ ] Mettre un syteme d'erreur mieux.<br/>
+- [ ] Enlever les serials prints.<br/>
+- [ ] Logger sur la carte SD avec le server.<br/>
+- [ ] Tester avec 4 ESP32.<br/>
+- [ ] Tester si les ESP32 en avant peuvent bien transmettre les donnes.<br/>
 
 ### Resources
 Vidéo utilisé pour faire le code et comprendre comment ESP-NOW fonctionne: <br/>
