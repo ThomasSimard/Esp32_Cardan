@@ -10,6 +10,9 @@ Le code du server est pour le ESP32 sur le Baja. Il reçoit les données des cap
 Le code du broadcaster est celui qui vas dans les ESP32 sur les cardans arrière. Il permet de lire l'entré analogue de l'amplificateur et de l'envoyer à l'esp du server. De plus, il fait un pont entre le server et les ESP32 des cardans avant pour avoir une meilleur connection en évitant que les ondes passent par le firewall. (À tester)
 ### Setup
 Chaque ESP32 a une adresse MAC unique, pour la déterminer il suffit d'upload le code de setup. Ceci est important pour savoir lequel des ESP32 est le server et où se situe les ESP32 sur le baja (arrière, devant, droite, gauche).
+
+1. D4:8A:FC:CE:D4:C4
+2. FC:B4:67:F5:EC:28
 ### LED
 On définit 3 LED de couleur variables (RGB) qui ont pour fonction de nous indiquer différents états du système. <br/>
 <br/>
