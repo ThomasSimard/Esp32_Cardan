@@ -17,7 +17,7 @@
 esp_now_peer_info_t peerInfo;
 
 // Pins
-constexpr unsigned short AnalogIn = 36;
+constexpr unsigned short AnalogIn = 34;
 
 // Callback function called when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {}
@@ -59,7 +59,7 @@ void loop() {
   }
 
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcaster_address, (uint8_t *)&data, sizeof(Data));
+  esp_err_t result = esp_now_send(server_address, (uint8_t *)&data, sizeof(Data));
 
 /*   
   if (result == ESP_OK) {
