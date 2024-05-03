@@ -61,9 +61,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
       Serial.print("\tValue 2: ");
       Serial.println(compression.d[1]);
 
-      //bool isRecording = digitalRead(Toggle);
+      bool isRecording = digitalRead(Toggle);
 
-      /*
+      
       sdLED.selectColour(255, 255, 1)  //jaune, enregistrement en cours
 
       if(isRecording){
@@ -101,7 +101,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
           delay(20);
               break;
-            }*/
+            }
     }
   }
 }
