@@ -15,15 +15,17 @@ namespace SD_CARD {
   String path = "data";
 
   void LogSDCard(){
-    myFile = SD.open(path + "log.csv", FILE_WRITE);
+    myFile = SD.open("BAJA/0/log.csv", FILE_WRITE);
 
     if (myFile) {
       //Success opening fine
 
       myFile.println(compression.d[0]);
       myFile.println(compression.d[1]);
+
+      myFile.close();
     } else {
-      //("Error opening file");
+      Serial.print("Error opening file");
     }
   }
 
@@ -31,14 +33,13 @@ namespace SD_CARD {
     do {
       path = "data";
       path += String(fileCount);
-      //path += ".csv";
 
       fileCount++;
     }while(SD.exists(path));
   }
 
   void CreateDir(const String& path){
-    if(SD.mkdir(path)){
+    if(SD.mkdir(path.c_str())){
       Serial.println("Dir created");
     } else {
       Serial.println("mkdir failed");
@@ -46,14 +47,13 @@ namespace SD_CARD {
   }
 
   void Initialize() {
-    // Set microSD Card CS as OUTPUT and set HIGH
-    pinMode(CS, OUTPUT);      
-    digitalWrite(CS, HIGH); 
-    
     // Initialize SPI bus for microSD Card
-    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
+    //SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, CS);
 
-    while (!SD.begin(CS)) {
+    SPIClass spi = SPIClass(VSPI);
+    spi.begin(SPI_SCK, SPI_MISO, SPI_MOSI, CS);
+
+    while (!SD.begin(CS,spi,80000000)) {
       // No sd card
       Serial.println("PROBLEME SD");
       delay(100);

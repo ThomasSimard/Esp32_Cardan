@@ -16,7 +16,7 @@ bool isOpen = false;
 int fileCount = 0;
 File myFile;
 
-constexpr unsigned Toggle = 23;
+constexpr unsigned Toggle = 22;
 
 bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
   return (mac0[0] == mac1[0] &&
@@ -29,9 +29,13 @@ bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
 
 
 /*Define LEDs*/
-RGB_LED comLED(34, 35, 32);
-RGB_LED sdLED(33, 25, 26);
-RGB_LED gpsLED(27, 14, 12);
+//RGB_LED comLED(34, 35, 32);
+//RGB_LED sdLED(33, 25, 26);
+//RGB_LED gpsLED(27, 14, 12);
+
+RGB_LED sdLED(14, 12, 13);
+RGB_LED comLED(27, 25, 26);
+
 
 class Capteur {
 private:
@@ -68,49 +72,11 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
       bool isRecording = digitalRead(Toggle);
 
-      
-      sdLED.selectColour(255, 255, 1);  //jaune, enregistrement en cours
+      //sdLED.selectColour(255, 255, 1);  //jaune, enregistrement en cours
 
       if(isRecording){
-        if(!isOpen){
-          // Open the file at the beginning of the program
-        
-          String filename = "data";
-          do {
-            filename = "data";
-            filename += String(fileCount);
-            filename += ".csv";
-
-            fileCount++;
-          }while(SD.exists(filename));
-
-          myFile = SD.open(filename, FILE_WRITE);
-          if (myFile) {
-            //D_println("File opened successfully");
-            isOpen = true;
-
-            delay(20);
-          } else {
-            //D_println("Error opening file");
-            sdLED.selectColour(255,1,1);
-          }
-      
-          myFile.println(compression.d[0]);
-          myFile.println(compression.d[1]);
-
-          }else{
-            myFile.close();
-            isOpen = false;
-            sdLED.selectColour(1,255,1);
-          }
-
-          delay(20);
-              //break;
-            }
-    }
- 
-
-      SD_CARD::LogSDCard();
+        SD_CARD::LogSDCard();
+      }
     //}
   //}
 }
@@ -118,8 +84,10 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 void setup() {
   // Set up Serial Monitor
   Serial.begin(115200);
+  Serial.print("init");
 
-  SD_CARD::Initialize();
+  pinMode(Toggle, INPUT);
+  //SD_CARD::Initialize();
   
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -135,8 +103,10 @@ void setup() {
 
   // Register callback function
   esp_now_register_recv_cb(OnDataRecv);
+
+  comLED.selectColour(0, 0, 50);
+  sdLED.selectColour(50, 0, 0);
 }
 
 void loop() {
- 
 }
