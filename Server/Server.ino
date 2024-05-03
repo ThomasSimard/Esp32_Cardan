@@ -22,9 +22,9 @@ bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
 
 
 /*Define LEDs*/
-//RGB_LED comLED(1, 0, 2);
-//RGB_LED sdLED(3, 4, 5);
-//RGB_LED gpsLED(6, 7, 8);
+RGB_LED comLED(34, 35, 32);
+RGB_LED sdLED(33, 25, 26);
+RGB_LED gpsLED(27, 14, 12);
 
 class Capteur {
 private:
