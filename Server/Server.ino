@@ -1,12 +1,10 @@
 // Include Libraries
-#include <SPI.h>
-#include <SD.h>
-
 #include <esp_now.h>
 #include <WiFi.h>
 
 #include <DataStructure.h> //Put the Local Libraries DataStructure folder into your arduinos library folder
 #include "RGB_LED.h"
+#include "SD_CARD.h"
 
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
@@ -24,9 +22,9 @@ bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
 
 
 /*Define LEDs*/
-RGB_LED comLED(1, 0, 2);
-RGB_LED sdLED(3, 4, 5);
-RGB_LED gpsLED(6, 7, 8);
+//RGB_LED comLED(1, 0, 2);
+//RGB_LED sdLED(3, 4, 5);
+//RGB_LED gpsLED(6, 7, 8);
 
 class Capteur {
 private:
@@ -40,15 +38,15 @@ public:
 };
 
 Capteur ESPs[] = { 
-  Capteur(broadcaster_address)
+  Capteur(client_address)
 };
 
 // Callback function executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&data, incomingData, sizeof(Data));
 
-  for(const auto& ESP : ESPs){
-    if(ESP.CheckMac(mac)){
+  //for(const auto& ESP : ESPs){
+    //if(ESP.CheckMac(mac)){
       Serial.print(data.flags);
       Serial.print("\t");
       Serial.print(millis());
@@ -105,18 +103,16 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
     }
   }
 
+      SD_CARD::LogSDCard();
+    //}
+  //}
+}
  
 void setup() {
   // Set up Serial Monitor
   Serial.begin(115200);
 
-  comLED.selectColor(255, 0, 0);
-
-  /* SD */
-  while (!SD.begin(SD_ChipSelect)) {
-    sdLED.selectColor(255,1,1);
-    delay(100);
-  }
+  SD_CARD::Initialize();
   
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
