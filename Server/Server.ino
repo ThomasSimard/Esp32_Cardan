@@ -11,6 +11,13 @@
 /*initialisation carte SD*/
 constexpr unsigned SD_ChipSelect = 5; 
 
+//Esti d'ordi d'épais
+bool isOpen = false;
+int fileCount = 0;
+File myFile;
+
+constexpr unsigned Toggle = 23;
+
 bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
   return (mac0[0] == mac1[0] &&
         mac0[1] == mac1[1] &&
@@ -62,7 +69,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
       bool isRecording = digitalRead(Toggle);
 
       
-      sdLED.selectColour(255, 255, 1)  //jaune, enregistrement en cours
+      sdLED.selectColour(255, 255, 1);  //jaune, enregistrement en cours
 
       if(isRecording){
         if(!isOpen){
@@ -79,17 +86,17 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
           myFile = SD.open(filename, FILE_WRITE);
           if (myFile) {
-            D_println("File opened successfully");
+            //D_println("File opened successfully");
             isOpen = true;
 
             delay(20);
           } else {
-            D_println("Error opening file");
-            digitalWrite(RedLed1, HIGH);
+            //D_println("Error opening file");
+            sdLED.selectColour(255,1,1);
           }
-      }
-          MyFile.println(compression.d[0]);
-          MyFile.println(compression.d[1]);
+      
+          myFile.println(compression.d[0]);
+          myFile.println(compression.d[1]);
 
           }else{
             myFile.close();
@@ -98,10 +105,10 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
           }
 
           delay(20);
-              break;
+              //break;
             }
     }
-  }
+ 
 
       SD_CARD::LogSDCard();
     //}
@@ -121,7 +128,11 @@ void setup() {
   if (esp_now_init() != ESP_OK) {
     ESP.restart();
   }
-  
+
+  File myFile;  // Création du fichier pour la carte SD
+  bool isOpen = false;
+  unsigned fileCount = 0;
+
   // Register callback function
   esp_now_register_recv_cb(OnDataRecv);
 }
