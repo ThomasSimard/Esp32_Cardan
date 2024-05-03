@@ -11,7 +11,7 @@
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
 /*initialisation carte SD*/
-constexpr unsigned SD_ChipSelect = 10; 
+constexpr unsigned SD_ChipSelect = 5; 
 
 bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
   return (mac0[0] == mac1[0] &&
@@ -104,7 +104,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
             }
     }
   }
-}
+
  
 void setup() {
   // Set up Serial Monitor
