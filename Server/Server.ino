@@ -11,7 +11,6 @@
 /*initialisation carte SD*/
 constexpr unsigned SD_ChipSelect = 5; 
 
-//Esti d'ordi d'épais
 bool isOpen = false;
 int fileCount = 0;
 File myFile;
@@ -33,7 +32,6 @@ bool CompareMacAddress(const uint8_t * mac0, const uint8_t * mac1) {
 //RGB_LED sdLED(33, 25, 26);
 //RGB_LED gpsLED(27, 14, 12);
 
-RGB_LED sdLED(14, 12, 13);
 RGB_LED comLED(27, 25, 26);
 
 
@@ -52,33 +50,47 @@ Capteur ESPs[] = {
   Capteur(client_address)
 };
 
+bool lastRecording = true;
+
+bool updateToggle(){
+ bool isToggled = digitalRead(Toggle);
+
+ if(isToggled){
+  SD_CARD::LED.selectColor(0, 50, 0);
+ }else{
+  SD_CARD::LED.selectColor(0, 0, 0);
+ }
+ 
+ return isToggled;
+}
+
+unsigned fileTimer = 0;
+unsigned fileLineMax = 3;
+
 // Callback function executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&data, incomingData, sizeof(Data));
 
-  //for(const auto& ESP : ESPs){
-    //if(ESP.CheckMac(mac)){
-      Serial.print(data.flags);
-      Serial.print("\t");
-      Serial.print(millis());
-      Serial.print("\t");
+  Serial.println(data.flags);
 
-      ReadBuffer(0);
+  if(updateToggle()){
+    if(fileTimer == 0){
+      SD_CARD::myFile = SD.open(SD_CARD::path + "/log_esp" + data.flags + ".csv", FILE_WRITE);
+    }
 
-      Serial.print("Value 1: ");
-      Serial.print(compression.d[0]);
-      Serial.print("\tValue 2: ");
-      Serial.println(compression.d[1]);
+    fileTimer++;
+    SD_CARD::LogSDCard();
 
-      bool isRecording = digitalRead(Toggle);
+    if(fileTimer >= fileLineMax){
+      fileTimer = 1;
+    }
 
-      //sdLED.selectColour(255, 255, 1);  //jaune, enregistrement en cours
+    lastRecording = true;
+  }else if(lastRecording){
+    SD_CARD::GetFileName();
 
-      if(isRecording){
-        SD_CARD::LogSDCard();
-      }
-    //}
-  //}
+    lastRecording = false;
+  }
 }
  
 void setup() {
@@ -87,7 +99,7 @@ void setup() {
   Serial.print("init");
 
   pinMode(Toggle, INPUT);
-  //SD_CARD::Initialize();
+  SD_CARD::Initialize();
   
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -97,15 +109,12 @@ void setup() {
     ESP.restart();
   }
 
-  File myFile;  // Création du fichier pour la carte SD
-  bool isOpen = false;
-  unsigned fileCount = 0;
-
   // Register callback function
   esp_now_register_recv_cb(OnDataRecv);
 
-  comLED.selectColour(0, 0, 50);
-  sdLED.selectColour(50, 0, 0);
+  updateToggle();
+
+  //comLED.selectColour(0, 0, 50);
 }
 
 void loop() {

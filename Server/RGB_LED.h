@@ -10,7 +10,7 @@ public:
     pinMode(bluePin, OUTPUT);
   }
 
-  void selectColour(const unsigned short& redValue, const unsigned short& greenValue, const unsigned short& blueValue){
+  void selectColor(const unsigned short& redValue, const unsigned short& greenValue, const unsigned short& blueValue){
     analogWrite(redPin, redValue);
     analogWrite(greenPin, greenValue);
     analogWrite(bluePin, blueValue);

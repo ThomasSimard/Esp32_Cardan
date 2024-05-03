@@ -12,18 +12,27 @@ namespace SD_CARD {
 
   File myFile;  // Création du fichier pour la carte SD
   unsigned fileCount = 0;
-  String path = "data";
+  String path = "/data";
+
+  RGB_LED LED(14, 12, 13);
 
   void LogSDCard(){
-    myFile = SD.open("BAJA/0/log.csv", FILE_WRITE);
-
     if (myFile) {
       //Success opening fine
+      myFile.print("Temps: ");
+      myFile.println(millis());
 
-      myFile.println(compression.d[0]);
-      myFile.println(compression.d[1]);
+      for(unsigned i = 0; i < 83; i++){
+        ReadBuffer(i);
+        
+        myFile.print(compression.d[0]);
+        myFile.print(",");
+        myFile.print(compression.d[1]);
+        myFile.print(",");
+      }
+      myFile.println("");
 
-      myFile.close();
+      myFile.flush();
     } else {
       Serial.print("Error opening file");
     }
@@ -31,7 +40,7 @@ namespace SD_CARD {
 
   void GetFileName() {
     do {
-      path = "data";
+      path = "/data";
       path += String(fileCount);
 
       fileCount++;
@@ -48,14 +57,12 @@ namespace SD_CARD {
 
   void Initialize() {
     // Initialize SPI bus for microSD Card
-    //SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, CS);
+    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, CS);
 
-    SPIClass spi = SPIClass(VSPI);
-    spi.begin(SPI_SCK, SPI_MISO, SPI_MOSI, CS);
-
-    while (!SD.begin(CS,spi,80000000)) {
+    while (!SD.begin(CS)) {
       // No sd card
       Serial.println("PROBLEME SD");
+      LED.selectColor(50, 50, 0);
       delay(100);
     }
 
