@@ -75,11 +75,11 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
   if(updateToggle()){
     if(fileTimer == 0){
-      SD_CARD::myFile = SD.open(SD_CARD::path + "/log_esp" + data.flags + ".csv", FILE_WRITE);
+      SD_CARD::myFile = SD.open(SD_CARD::path + "/log.csv", FILE_WRITE);
     }
 
     fileTimer++;
-    SD_CARD::LogSDCard();
+    SD_CARD::LogSDCard(data.flags);
 
     if(fileTimer >= fileLineMax){
       fileTimer = 1;

@@ -1,12 +1,3 @@
-/*
-  ESP-NOW Demo - Transmit
-  esp-now-demo-xmit.ino
-  Sends data to Responder
-  
-  DroneBot Workshop 2022
-  https://dronebotworkshop.com
-*/
- 
 // Include Libraries
 #include <esp_now.h>
 #include <WiFi.h>
@@ -58,7 +49,7 @@ void loop() {
     delayMicroseconds(250); // Save power
   }
 
-  data.flags = 3;
+  data.flags = 2;
 
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(server_address, (uint8_t *)&data, sizeof(Data));

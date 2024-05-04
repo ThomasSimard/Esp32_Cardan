@@ -16,10 +16,12 @@ namespace SD_CARD {
 
   RGB_LED LED(14, 12, 13);
 
-  void LogSDCard(){
+  void LogSDCard(const unsigned& flags){
     if (myFile) {
       //Success opening fine
-      myFile.print("Temps: ");
+      myFile.print("Esp,");
+      myFile.print(flags);
+      myFile.print(",Temps,");
       myFile.println(millis());
 
       for(unsigned i = 0; i < 83; i++){
