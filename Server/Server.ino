@@ -6,14 +6,19 @@
 #include "RGB_LED.h"
 #include "SD_CARD.h"
 
+#include <TinyGPS++.h>
+
+#define GPS_BAUDRATE 9600  // The default baudrate of NEO-6M is 9600
+
+TinyGPSPlus gps;  // the TinyGPS++ object
+
+#define RXD2 16
+#define TXD2 17
+
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
 /*initialisation carte SD*/
 constexpr unsigned SD_ChipSelect = 5; 
-
-bool isOpen = false;
-int fileCount = 0;
-File myFile;
 
 constexpr unsigned Toggle = 22;
 
@@ -53,12 +58,12 @@ Capteur ESPs[] = {
 bool lastRecording = true;
 
 bool updateToggle(){
- bool isToggled = digitalRead(Toggle);
+ bool isToggled = !digitalRead(Toggle);
 
  if(isToggled){
   SD_CARD::LED.selectColor(0, 50, 0);
  }else{
-  SD_CARD::LED.selectColor(0, 0, 0);
+  SD_CARD::LED.selectColor(0, 0, 100);
  }
  
  return isToggled;
@@ -74,20 +79,13 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.println(data.flags);
 
   if(updateToggle()){
-    if(fileTimer == 0){
-      SD_CARD::myFile = SD.open(SD_CARD::path + "/log.csv", FILE_WRITE);
-    }
-
-    fileTimer++;
     SD_CARD::LogSDCard(data.flags);
-
-    if(fileTimer >= fileLineMax){
-      fileTimer = 1;
-    }
 
     lastRecording = true;
   }else if(lastRecording){
     SD_CARD::GetFileName();
+    SD_CARD::myFile.close();
+    SD_CARD::myFile = SD.open(SD_CARD::path + "/log.csv", FILE_WRITE);
 
     lastRecording = false;
   }
@@ -95,8 +93,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
  
 void setup() {
   // Set up Serial Monitor
-  Serial.begin(115200);
-  Serial.print("init");
+  Serial.begin(9600);
+  Serial2.begin(GPS_BAUDRATE, SERIAL_8N1,RXD2,TXD2);
 
   pinMode(Toggle, INPUT);
   SD_CARD::Initialize();
@@ -118,4 +116,60 @@ void setup() {
 }
 
 void loop() {
+  if (Serial2.available() > 0) {
+    if (gps.encode(Serial2.read())) {
+      if (SD_CARD::myFile) {
+        if (gps.location.isValid()) {
+          //Success opening fine
+          SD_CARD::myFile.print("GPS,Location,VALID,Latitude,");
+          SD_CARD::myFile.print(gps.location.lat());
+          SD_CARD::myFile.print(",Longitude,");
+          SD_CARD::myFile.print(gps.location.lng());
+          SD_CARD::myFile.print(",Altitude,");
+
+          if (gps.altitude.isValid())
+            SD_CARD::myFile.println(gps.altitude.meters());
+          else
+            SD_CARD::myFile.println("INVALID");
+        } else {
+          SD_CARD::myFile.println("GPS,Location,INVALID");
+        }
+
+        if (gps.speed.isValid()) {
+          SD_CARD::myFile.print("GPS,Speed,VALID,");
+          SD_CARD::myFile.println(gps.speed.kmph());
+        } else {
+          SD_CARD::myFile.println("GPS,Speed,INVALID");
+        }
+
+        if (gps.date.isValid() && gps.time.isValid()) {
+          SD_CARD::myFile.print("GPS,Date,VALID,");
+          SD_CARD::myFile.print(gps.date.year());
+          SD_CARD::myFile.print("-");
+          SD_CARD::myFile.print(gps.date.month());
+          SD_CARD::myFile.print("-");
+          SD_CARD::myFile.print(gps.date.day());
+          SD_CARD::myFile.print(" ");
+          SD_CARD::myFile.print(gps.time.hour());
+          SD_CARD::myFile.print(":");
+          SD_CARD::myFile.print(gps.time.minute());
+          SD_CARD::myFile.print(":");
+          SD_CARD::myFile.print(gps.time.second());
+        } else {
+          SD_CARD::myFile.println("GPS,Date,INVALID");
+        }
+
+        SD_CARD::myFile.print("Time Refference,");
+        SD_CARD::myFile.println(millis());
+
+        SD_CARD::myFile.flush();
+      }
+    }
+  }
+
+  if (millis() > 5000 && gps.charsProcessed() < 10){
+    Serial.println(F("No GPS data received: check wiring"));
+  }
+
+  delay(10);
 }

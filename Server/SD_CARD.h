@@ -64,12 +64,14 @@ namespace SD_CARD {
     while (!SD.begin(CS)) {
       // No sd card
       Serial.println("PROBLEME SD");
-      LED.selectColor(50, 50, 0);
+      LED.selectColor(200, 50, 0);
       delay(100);
     }
 
     GetFileName();
     CreateDir(path);
+
+    myFile = SD.open(SD_CARD::path + "/log.csv", FILE_WRITE);
   }
 }
 
