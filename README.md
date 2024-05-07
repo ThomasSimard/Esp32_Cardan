@@ -3,13 +3,11 @@ Code pour les capteurs des cardans.
 
 ![SystemDiagram](SystemDiagram.drawio.png)
 ### Client
-Le code du client est celui qui vas dans les ESP32 sur les cardans avant. Il permet de lire l'entré analogue de l'amplificateur et de l'envoyer au broadcaster.
+Le code du client est celui qui vas dans les ESP32 sur les cardans. Il permet de lire l'entré analogue de l'amplificateur et de l'envoyer au server. Pour différencier les ESP32, il faut changer le ``data.flags = (numero du esp que l'on souhaite)``.
 ### Server
 Le code du server est pour le ESP32 sur le Baja. Il reçoit les données des capteurs sur les cardans.
-### Broadcaster
-Le code du broadcaster est celui qui vas dans les ESP32 sur les cardans arrière. Il permet de lire l'entré analogue de l'amplificateur et de l'envoyer à l'esp du server. De plus, il fait un pont entre le server et les ESP32 des cardans avant pour avoir une meilleur connection en évitant que les ondes passent par le firewall. (À tester)
 ### Setup
-Chaque ESP32 a une adresse MAC unique, pour la déterminer il suffit d'upload le code de setup. Ceci est important pour savoir lequel des ESP32 est le server et où se situe les ESP32 sur le baja (arrière, devant, droite, gauche).
+Chaque ESP32 a une adresse MAC unique, pour la déterminer il suffit d'upload le code de setup. Ceci est important pour savoir lequel des ESP32 est le server.
 
 1. D4:8A:FC:CE:D4:C4
 2. FC:B4:67:F5:EC:28
@@ -30,22 +28,19 @@ commLED: indique l'état de la communication entres les cardans <br/>
 GPSLED: indique l'état du GPS <br/>
 
 ### Libraries
-Changer les adresses MAC suivante:
+Changer les adresses MAC du server:
 ```
-constexpr uint8_t client_address[] = {0x84, 0xCC, 0xA8, 0x61, 0x01, 0x4C};
 constexpr uint8_t server_address[] = {0xFC, 0xB4, 0x67, 0xF5, 0x68, 0x20};
-
-//Il est important de mettre l'addresse du ESP qui est directement en arriere de lui
-constexpr uint8_t broadcaster_address[] = {0x84, 0xCC, 0xA8, 0x60, 0xCC, 0xE4};
 ```
-Ensuite pour pouvoir compiler le code du Broadcaster, Client et Server, il faut copier coller la librarie dans le folder des libraries Arduino.
+Ensuite pour pouvoir compiler le code du client et du server, il faut copier coller la librarie dans le folder des libraries Arduino ou mettre ``DataStructure.h`` dans le folder du sketch.
 
 ## Futur
 - [ ] Mettre un syteme d'erreur mieux.<br/>
 - [ ] Enlever les serials prints.<br/>
-- [ ] Logger sur la carte SD avec le server.<br/>
-- [ ] Tester avec 4 ESP32.<br/>
-- [ ] Tester si les ESP32 en avant peuvent bien transmettre les donnes.<br/>
+- [ ] Analyser les données.<br/>
+- [ x ] Logger sur la carte SD avec le server.<br/>
+- [ x ] Tester avec 4 ESP32.<br/>
+- [ x ] Tester si les ESP32 en avant peuvent bien transmettre les donnes.<br/>
 
 ### Resources
 Vidéo utilisé pour faire le code et comprendre comment ESP-NOW fonctionne: <br/>
