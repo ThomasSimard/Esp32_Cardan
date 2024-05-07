@@ -78,7 +78,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
   Serial.println(data.flags);
 
-  if(updateToggle()){
+  /*if(updateToggle()){
     SD_CARD::LogSDCard(data.flags);
 
     lastRecording = true;
@@ -88,16 +88,16 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
     SD_CARD::myFile = SD.open(SD_CARD::path + "/log.csv", FILE_WRITE);
 
     lastRecording = false;
-  }
+  }*/
 }
  
 void setup() {
   // Set up Serial Monitor
   Serial.begin(9600);
-  Serial2.begin(GPS_BAUDRATE, SERIAL_8N1,RXD2,TXD2);
+  //Serial2.begin(GPS_BAUDRATE, SERIAL_8N1,RXD2,TXD2);
 
   pinMode(Toggle, INPUT);
-  SD_CARD::Initialize();
+  //SD_CARD::Initialize();
   
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -116,7 +116,7 @@ void setup() {
 }
 
 void loop() {
-  if (Serial2.available() > 0) {
+  /*if (Serial2.available() > 0) {
     if (gps.encode(Serial2.read())) {
       if (SD_CARD::myFile) {
         if (gps.location.isValid()) {
@@ -169,7 +169,7 @@ void loop() {
 
   if (millis() > 5000 && gps.charsProcessed() < 10){
     Serial.println(F("No GPS data received: check wiring"));
-  }
+  }*/
 
   delay(10);
 }
